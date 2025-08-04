@@ -2,11 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLogin } from "@/hooks/api/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 import {
   Form,
@@ -25,6 +28,8 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginFormData>({
@@ -35,9 +40,23 @@ export default function LoginForm() {
     },
   });
 
+  const { mutate, isPending } = useLogin();
+
   const onSubmit = (data: LoginFormData) => {
-    console.log("Form submitted:", data);
-    // TODO: trigger API
+    const payload = {
+      email: data.email,
+      password: data.password,
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Login successful!");
+        router.push("/home");
+      },
+      onError: (error) => {
+        console.error("Error loggin user:", error);
+        toast.error("Something went wrong!");
+      },
+    });
   };
 
   return (
@@ -101,7 +120,7 @@ export default function LoginForm() {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button disabled={isPending} type="submit" className="w-full">
             Login
           </Button>
         </form>

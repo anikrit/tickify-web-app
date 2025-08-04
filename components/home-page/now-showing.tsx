@@ -1,7 +1,11 @@
-import movies from "@/public/data/movies.json";
+"use client";
+
+import { useMovies } from "@/hooks/api/useMovie";
 import MovieCard from "../movie-card";
 
 export default function NowShowing() {
+  const { data } = useMovies(1, 4);
+
   return (
     <div>
       <div className="mb-8">
@@ -12,9 +16,10 @@ export default function NowShowing() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {movies.slice(0, 4).map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
+        {data &&
+          data.movies.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
       </div>
     </div>
   );

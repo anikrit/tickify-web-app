@@ -1,5 +1,6 @@
 "use client";
 
+import { useLogout, useMe } from "@/hooks/api/useAuth";
 import { Film, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,9 @@ import { Button } from "./ui/button";
 export default function Navigation() {
   // Hooks
   const router = useRouter();
+
+  const { data } = useMe();
+  const { mutate } = useLogout();
 
   // Local States
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -44,20 +48,41 @@ export default function Navigation() {
               My Bookings
             </Link>
           </div>
-          {/* Right Side Actions*/}
+          {/* Right Side Actions */}
           <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-300 hover:text-white"
-              onClick={() => router.push("/login")}
-            >
-              <User className="w-4 h-4" />
-              Sign In
-            </Button>
-            <Button size="sm" onClick={() => router.push("/register")}>
-              Get Started
-            </Button>
+            {data?.user ? (
+              <>
+                <span className="text-sm text-gray-300">
+                  Hi, {data.user.name}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white"
+                  onClick={async () => {
+                    mutate();
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-300 hover:text-white"
+                  onClick={() => router.push("/login")}
+                >
+                  <User className="w-4 h-4" />
+                  Sign In
+                </Button>
+                <Button size="sm" onClick={() => router.push("/register")}>
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
           {/* Mobile Menu Button */}
           <Button

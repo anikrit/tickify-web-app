@@ -2,11 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useRegister } from "@/hooks/api/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 import {
   Form,
@@ -41,6 +44,8 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -54,9 +59,24 @@ export default function RegisterForm() {
     },
   });
 
+  const { mutate, isPending } = useRegister();
+
   const onSubmit = (data: RegisterFormData) => {
-    console.log("Form submitted:", data);
-    // TODO: trigger API
+    const payload = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+    mutate(payload, {
+      onSuccess: () => {
+        toast.success("Successfully registered!");
+        router.push("/login");
+      },
+      onError: (error) => {
+        console.error("Error creating user:", error);
+        toast.error("Something went wrong!");
+      },
+    });
   };
 
   return (
@@ -172,7 +192,7 @@ export default function RegisterForm() {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button disabled={isPending} type="submit" className="w-full">
             Create account
           </Button>
         </form>

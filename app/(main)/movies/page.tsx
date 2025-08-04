@@ -9,17 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMovies } from "@/hooks/api/useMovie";
 import movies from "@/public/data/movies.json";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export default function MoviesPage() {
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<string>("8");
 
-  const paginatedMovies = useMemo(() => {
-    const size = Number(pageSize);
-    return movies.slice((page - 1) * size, page * size);
-  }, [page, pageSize]);
+  const { data } = useMovies(page, Number(pageSize));
 
   return (
     <>
@@ -50,9 +48,10 @@ export default function MoviesPage() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {paginatedMovies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
+        {data &&
+          data.movies.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
       </div>
     </>
   );

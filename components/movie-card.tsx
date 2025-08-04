@@ -1,20 +1,9 @@
+import { Movie } from "@/types/movie.types";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-
-type Movie = {
-  id: string;
-  title: string;
-  genre: string;
-  duration: string;
-  rating: number;
-  poster: string;
-  description: string;
-  showtimes: string[];
-  theaters: string[];
-};
 
 export default function MovieCard({ movie }: { movie: Movie }) {
   return (
@@ -25,7 +14,7 @@ export default function MovieCard({ movie }: { movie: Movie }) {
     >
       <div className="aspect-[3/4] relative">
         <Image
-          src={movie.poster || "/placeholder.svg"}
+          src={"/placeholder.svg"}
           alt={movie.title}
           fill
           className="object-cover"
